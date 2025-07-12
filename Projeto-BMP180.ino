@@ -1,6 +1,6 @@
 #include <Wire.h> 
 #include <Adafruit_BMP085.h>
-
+ 
 #define ledVerd 13
 #define ledVerdDOIS 12
 #define ledAmar 14
