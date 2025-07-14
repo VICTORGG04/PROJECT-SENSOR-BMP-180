@@ -1,110 +1,111 @@
-#include <Wire.h> 
+#include <Wire.h>
 #include <Adafruit_BMP085.h>
- 
-#define ledVerd 13
-#define ledVerdDOIS 12
-#define ledAmar 14
-#define ledAmarDOIS 27
-#define ledVerm 26
-#define ledVermDOIS 25
-const int buzzer = 23;
-int pot = 34; 
+
+const int LED_GREEN_1 = 13;
+const int LED_GREEN_2 = 32;
+const int LED_YELLOW_1 = 14;
+const int LED_YELLOW_2 = 27;
+const int LED_RED_1 = 26;
+const int LED_RED_2 = 25;
+const int BUZZER_PIN = 23;
+const int POTENTIOMETER_PIN = 34;
 
 Adafruit_BMP085 bmp;
 
 void setup() {
   Serial.begin(9600);
 
-  pinMode(ledVerd, OUTPUT);
-  pinMode(ledVerdDOIS, OUTPUT);
-  pinMode(ledAmar, OUTPUT);
-  pinMode(ledAmarDOIS, OUTPUT);
-  pinMode(ledVerm, OUTPUT);
-  pinMode(ledVermDOIS, OUTPUT);
-  pinMode(buzzer, OUTPUT);
+  pinMode(LED_GREEN_1, OUTPUT);
+  pinMode(LED_GREEN_2, OUTPUT);
+  pinMode(LED_YELLOW_1, OUTPUT);
+  pinMode(LED_YELLOW_2, OUTPUT);
+  pinMode(LED_RED_1, OUTPUT);
+  pinMode(LED_RED_2, OUTPUT);
+  pinMode(BUZZER_PIN, OUTPUT);
 
-  // Verifica se o sensor foi encontrado
   if (!bmp.begin()) {
-    Serial.println("Sensor BMP180 não encontrado. Verifique as conexões!");
-    while (1); // Trava o programa se o sensor não for encontrado
+    Serial.println("BMP180 Sensor not found. Please check connections!");
+    while (true); 
   }
 
-  Serial.println("Sensor BMP180 inicializado com sucesso!");
+  Serial.println("BMP180 Sensor initialized successfully!");
   Serial.println("------------------------------------");
 }
 
 void loop() {
   float temperature = bmp.readTemperature();
-  Serial.print("Temperatura = ");
+  long pressure = bmp.readPressure();
+  float altitude = bmp.readAltitude(101325); 
+
+  Serial.print("Temperature = ");
   Serial.print(temperature);
   Serial.println(" *C");
 
-  long pressure = bmp.readPressure();
-  Serial.print("Pressao = ");
+  Serial.print("Pressure = ");
   Serial.print(pressure);
   Serial.println(" Pa");
 
-  float altitude = bmp.readAltitude(101325);
-  Serial.print("Altitude aproximada = ");
+  Serial.print("Approximate Altitude = ");
   Serial.print(altitude);
-  Serial.println(" metros");
+  Serial.println(" meters");
 
   Serial.println("------------------------------------");
 
-  // --- Lógica dos LEDs baseada na pressão ---
-  digitalWrite(ledVerd, LOW);
-  digitalWrite(ledVerdDOIS, LOW);
-  digitalWrite(ledAmar, LOW);
-  digitalWrite(ledAmarDOIS, LOW);
-  digitalWrite(ledVerm, LOW);
-  digitalWrite(ledVermDOIS, LOW);
+  // --- LED Logic based on Pressure ---
+  digitalWrite(LED_GREEN_1, LOW);
+  digitalWrite(LED_GREEN_2, LOW);
+  digitalWrite(LED_YELLOW_1, LOW);
+  digitalWrite(LED_YELLOW_2, LOW);
+  digitalWrite(LED_RED_1, LOW);
+  digitalWrite(LED_RED_2, LOW);
 
-  if (pressure > 100500 && pressure < 101500) {
-    digitalWrite(ledVerd, HIGH);
+  // Use a switch-like structure with if-else if for pressure ranges
+  if (pressure >= 101300 && pressure < 101500) {
+    digitalWrite(LED_GREEN_1, HIGH);
   } else if (pressure >= 101500 && pressure < 102000) {
-    digitalWrite(ledVerd, HIGH);
-    digitalWrite(ledVerdDOIS, HIGH);
+    digitalWrite(LED_GREEN_1, HIGH);
+    digitalWrite(LED_GREEN_2, HIGH);
   } else if (pressure >= 102000 && pressure < 102250) {
-    digitalWrite(ledVerd, HIGH);
-    digitalWrite(ledVerdDOIS, HIGH);
-    digitalWrite(ledAmar, HIGH);
+    digitalWrite(LED_GREEN_1, HIGH);
+    digitalWrite(LED_GREEN_2, HIGH);
+    digitalWrite(LED_YELLOW_1, HIGH);
   } else if (pressure >= 102500 && pressure < 102750) {
-    digitalWrite(ledVerd, HIGH);
-    digitalWrite(ledVerdDOIS, HIGH);
-    digitalWrite(ledAmar, HIGH);
-    digitalWrite(ledAmarDOIS, HIGH);
+    digitalWrite(LED_GREEN_1, HIGH);
+    digitalWrite(LED_GREEN_2, HIGH);
+    digitalWrite(LED_YELLOW_1, HIGH);
+    digitalWrite(LED_YELLOW_2, HIGH);
   } else if (pressure >= 102750 && pressure < 103000) {
-    digitalWrite(ledVerd, HIGH);
-    digitalWrite(ledVerdDOIS, HIGH);
-    digitalWrite(ledAmar, HIGH);
-    digitalWrite(ledAmarDOIS, HIGH);
-    digitalWrite(ledVerm, HIGH);
+    digitalWrite(LED_GREEN_1, HIGH);
+    digitalWrite(LED_GREEN_2, HIGH);
+    digitalWrite(LED_YELLOW_1, HIGH);
+    digitalWrite(LED_YELLOW_2, HIGH);
+    digitalWrite(LED_RED_1, HIGH);
   } else if (pressure >= 103000 && pressure < 103250) {
-    digitalWrite(ledVerd, HIGH);
-    digitalWrite(ledVerdDOIS, HIGH);
-    digitalWrite(ledAmar, HIGH);
-    digitalWrite(ledAmarDOIS, HIGH);
-    digitalWrite(ledVerm, HIGH);
-    digitalWrite(ledVermDOIS, HIGH);
+    digitalWrite(LED_GREEN_1, HIGH);
+    digitalWrite(LED_GREEN_2, HIGH);
+    digitalWrite(LED_YELLOW_1, HIGH);
+    digitalWrite(LED_YELLOW_2, HIGH);
+    digitalWrite(LED_RED_1, HIGH);
+    digitalWrite(LED_RED_2, HIGH);
   }
 
-  // --- Lógica do Buzzer controlada pelo potenciômetro ---
+  // --- Buzzer Logic controlled by Potentiometer ---
   if (pressure > 103000) {
-    int potValue = analogRead(pot);
+    int potValue = analogRead(POTENTIOMETER_PIN);
     int frequency = map(potValue, 0, 4095, 100, 2000);
 
-    Serial.print("Valor do Potenciômetro: ");
+    Serial.print("Potentiometer Value: ");
     Serial.print(potValue);
-    Serial.print(" -> Frequência do Buzzer: ");
+    Serial.print(" -> Buzzer Frequency: ");
     Serial.print(frequency);
     Serial.println(" Hz");
 
-    tone(buzzer, frequency);
-    delay(200);
-    noTone(buzzer);
+    tone(BUZZER_PIN, frequency);
+    delay(200); 
+    noTone(BUZZER_PIN);
     delay(200);
   } else {
-    noTone(buzzer);
+    noTone(BUZZER_PIN);
   }
   delay(1000);
 }
